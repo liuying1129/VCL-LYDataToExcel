@@ -33,8 +33,8 @@ unit ULYDataToExcel;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  StdCtrls, Buttons, ExtCtrls,db,Variants, ComCtrls,ComObj,math{max函数} ;
+  Windows, SysUtils, Classes, Graphics, Controls, Forms,
+  StdCtrls, Buttons, ExtCtrls, DB, Variants, ComCtrls, ComObj, math{max函数} ;
 
 type
   TfrmLYDataToExcel = class(TForm)
@@ -229,15 +229,18 @@ var
 begin
   if TreeView2.Items.Count=0 then
   begin
-    messagebox(handle,'没有选择要打印的字段！','提示',MB_OK	);
+    raise Exception.Create('请选择要打印的字段!');
     Exit;
   end;
 
   try
     VExcelApp := CreateOleObject('Excel.Application');
   except
-    messagebox(handle,'工作站还没有安装Execl软件！','提示',MB_OK	);
-    Exit;
+    on E:Exception do
+    begin
+      raise Exception.Create('Execl异常:'+E.Message);
+      exit;
+    end;
   end;
 
     if (not PrinDataSet.Active) or (PrinDataSet.RecordCount=0) then Exit;
